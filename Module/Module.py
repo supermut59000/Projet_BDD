@@ -20,17 +20,22 @@ def CreateMetadata(DatabaseObject):
     
     for Table in Tables:
         with open(PATH+ "/Metadata/"+ Table[0]+".txt", "w") as writer:
-            writer.write("ColumnName,Historique\nll")
+            writer.write("ColumnName,Historique\n")
             for Column in DatabaseObject.GetColumnFromTable(Table[0]):
                 TempText = f"{Column[0]},0\n"
                 writer.write(TempText)
 
-def ReadMetadata(FileName: str):
-    fd = open(FileName, 'r', encoding="utf8")
-    sqlFile = [x.split(',') for x in fd.read().split("\n")]
-    fd.close()
-    Metadata = [{sqlFile[0][0]: x[0], sqlFile[0][1]: x[1]} for x in sqlFile[1:]]
-    return Metadata
+def ReadMetadata():
+    FileNames = os.listdir(PATH+ "/Metadata/")
+    Metadatas = []
+    for FileName in FileNames:
+        fd = open(PATH+ "/Metadata/"+ FileName, 'r', encoding="utf8")
+        sqlFile = [x.split(',') for x in fd.read().split("\n") if x != '']
+        fd.close()
+        Metadata = [{sqlFile[0][0]: x[0], sqlFile[0][1]: x[1]} for x in sqlFile[1:]]
+        Metadatas.append(Metadata)
+        
+    return Metadatas, FileNames
 
 def create_date_table(start='2000-01-01', end='2020-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
@@ -59,7 +64,7 @@ def CreateTrackTable(DatabaseObject, metadata=[]):
     FROM ((({Table1}) {Table2}){Table3}){Table4};
     """
     for Criteria in metadata:
-        if Criteria.get("Historique") == 1:
+        if Criteria.get("Historique") == '1':
             SCD2(DatabaseObject,
                  "track_dim",
                  Criteria.get("ColumnName"))
