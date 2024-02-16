@@ -37,7 +37,7 @@ def ReadMetadata():
         
     return Metadatas, FileNames
 
-def create_date_table(start='2000-01-01', end='2020-12-31'):
+def create_date_table(start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
     df['date_id'] = df.index + 1
     df['year_D'] = df.Date_D.dt.year
@@ -68,6 +68,9 @@ def CreateTrackTable(DatabaseObject, metadata=[]):
             SCD2(DatabaseObject,
                  "track_dim",
                  Criteria.get("ColumnName"))
+            
+            
+            
             
     return 
 
