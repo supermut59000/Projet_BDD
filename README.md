@@ -4,7 +4,8 @@
 
 
 ## MCD de la base Entité-Association ##
-![alt tag](https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG){:width=100px height=100px} 
+<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="100" height="100">
+
 ## MLD de la base Entité-Association ##
 ```sql
 Employee = (EmployeeId INT, LastName VARCHAR(50), FirstName VARCHAR(50), Title VARCHAR(50), BirthDate VARCHAR(50), HireDate VARCHAR(50), Address VARCHAR(50), City VARCHAR(50), State VARCHAR(50), Country VARCHAR(50), PostalCode VARCHAR(50), Phone VARCHAR(50), Fax VARCHAR(50), Email VARCHAR(50), #EmployeeId_1);
