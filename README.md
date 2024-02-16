@@ -20,7 +20,7 @@ Track = (TrackId INT, Name VARCHAR(50), Composer VARCHAR(50), Miliseconds INT, B
 InvoiceLine = (InvoiceLineId INT, unitPrice DECIMAL(3,2), Quantity INT, #InvoiceId, #TrackId*);
 PlaylistTrack = (#TrackId, #PlaylistId);
 ```
-![alt tag](https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MLD_RESLINGER_BENNOUR.PNG?raw=true){:width="100px" height="100px"}
+<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MLD_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
 ## Exécution de la création de la base Entité-Association ##
 
 Pour exécuter le script de création deux solutions :
