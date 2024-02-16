@@ -4,7 +4,7 @@
 
 
 ## MCD de la base Entité-Association ##
-<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="100" height="100">
+<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="500" height="500">
 
 ## MLD de la base Entité-Association ##
 ```sql
