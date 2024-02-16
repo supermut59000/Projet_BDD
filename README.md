@@ -21,6 +21,7 @@ InvoiceLine = (InvoiceLineId INT, unitPrice DECIMAL(3,2), Quantity INT, #Invoice
 PlaylistTrack = (#TrackId, #PlaylistId);
 ```
 <img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MLD_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
+
 ## Exécution de la création de la base Entité-Association ##
 
 Pour exécuter le script de création deux solutions :
