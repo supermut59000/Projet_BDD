@@ -27,3 +27,5 @@ PlaylistTrack = (#TrackId, #PlaylistId);
 Pour exécuter le script de création deux solutions :
 - Utiliser le CreateBDD.exe
 - Utiliser le CreateBDD.py
+
+Une fois le .exe executé, ouvrir le fichier OP.db avec un interface de base de donnée.
