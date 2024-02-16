@@ -1,0 +1,8 @@
+ColumnName,Historique
+invoice_id,0
+billing_address,0
+billing_city,0
+billing_state,0
+billing_country,0
+billing_postal_code,0
+total,0
