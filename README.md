@@ -40,7 +40,7 @@ Pour exécuter le script de création deux solutions :
 - Utiliser le CreateDWH.exe
 - Utiliser le CreateDWH.py
 
-Une fois le script executé, un nouveau dossier Metadata contenant l'ensemble des tables ainsi qu'une colonne permettant l'apllication ou non du SCD2 sur celle-ci.
+Une fois le script executé, un nouveau dossier Metadata contenant l'ensemble des tables ainsi qu'une colonne permettant l'application ou non du SCD2 sur celle-ci.
 
 ##  Application de Type 2 Slowly Changing Dimension ##
 
