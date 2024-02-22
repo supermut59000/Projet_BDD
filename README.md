@@ -4,7 +4,7 @@
 
 
 ## MCD de la base Entité-Association ##
-<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
+<img src="https://github.com/supermut59000/Projet_BDD/blob/main/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
 
 ## MLD de la base Entité-Association ##
 ```sql
@@ -20,9 +20,31 @@ Track = (TrackId INT, Name VARCHAR(50), Composer VARCHAR(50), Miliseconds INT, B
 InvoiceLine = (InvoiceLineId INT, unitPrice DECIMAL(3,2), Quantity INT, #InvoiceId, #TrackId*);
 PlaylistTrack = (#TrackId, #PlaylistId);
 ```
-<img src="https://github.com/supermut59000/Projet_BDD/blob/amar/Assets/MLD_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
+<img src="https://github.com/supermut59000/Projet_BDD/blob/main/Assets/MLD_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
+
 ## Exécution de la création de la base Entité-Association ##
 
 Pour exécuter le script de création deux solutions :
 - Utiliser le CreateBDD.exe
 - Utiliser le CreateBDD.py
+
+Une fois le script executé, ouvrir le fichier OP.db avec un interface de base de donnée.
+
+
+## Schéma du DataWare House ##
+<img src="https://github.com/supermut59000/Projet_BDD/blob/main/Assets/SchemaDWH_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
+
+##  Exécution de la création du DataWare House ##
+
+Pour exécuter le script de création deux solutions :
+- Utiliser le CreateDWH.exe
+- Utiliser le CreateDWH.py
+
+Une fois le script executé, un nouveau dossier Metadata contenant l'ensemble des tables ainsi qu'une colonne permettant l'application ou non du SCD2 sur celle-ci.
+
+##  Application de Type 2 Slowly Changing Dimension ##
+
+Pour appliquer Slowly Changing Dimension sur le DataWare House deux solutions :
+- Utiliser le SCD2.exe
+- Utiliser le SCD2.py
+
