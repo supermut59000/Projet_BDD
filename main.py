@@ -9,9 +9,7 @@ import Module
 
 T1 = time.time()
 OperationnalDatabase = DataBaseHandler('OP.db')
-DataWareHouse = DataBaseHandler('DATA.db')
-
-
+DataWareHouse = DataBaseHandler('DWH.db')
 
 
 try:
@@ -19,8 +17,9 @@ try:
     #DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
     #Module.CreateMetadata(DataWareHouse)
     SCDData = Module.ReadMetadata()
-    track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
-    Module.CreateTrackTable(DataWareHouse, track_dim_metadata)
+    #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
+    #Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, track_dim_metadata)
+    data=Module.CreateInvoiceDim(OperationnalDatabase, metadata=[])
 except Exception as error:
     print("Cassé", error)
 finally:
@@ -30,13 +29,7 @@ finally:
     print(T2-T1)
     
     
-
-
-
-
-
-
-
+########Implémentation du DWH#########
 
 
 

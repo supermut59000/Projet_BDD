@@ -1,8 +1,11 @@
 from DatabaseHandler import DataBaseHandler
 import pandas as pd
 import os
+import sqlite3 as sql
 
 PATH = os.getcwd()
+
+
 
 def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(50)"):
     ColomnNames = ["StartTime","EndTime","IsChanged"]
@@ -54,25 +57,82 @@ def create_date_table(start='1990-01-01', end='2099-12-31'):
     return df
 
 
-def CreateTrackTable(DatabaseObject, metadata=[]):
-    Table1 = "Track LEFT JOIN Genre ON Track.GenreId = Genre.GenreId"
-    Table2 = "LEFT JOIN MediaType ON Track.MediaTypeId = MediaType.MediaTypeId"
-    Table3 = "LEFT JOIN Album ON Album.AlbumId = Track.AlbumId"
-    Table4 = "LEFT JOIN Artist ON Album.ArtistId = Artist.ArtistId"
+def CreateTrackTable(DataBaseOp, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    Table1 = "source.Track LEFT JOIN source.Genre ON source.Track.GenreId = source.Genre.GenreId"
+    Table2 = "LEFT JOIN source.MediaType ON source.Track.MediaTypeId = source.MediaType.MediaTypeId"
+    Table3 = "LEFT JOIN source.Album ON source.Album.AlbumId = source.Track.AlbumId"
+    Table4 = "LEFT JOIN source.Artist ON source.Album.ArtistId = source.Artist.ArtistId"
     request = f"""
     SELECT Track.TrackId, Track.Name, Track.Composer, Track.Milliseconds, Track.Bytes, Track.UnitPrice, MediaType.Name, Genre.Name, Album.Title, Artist.Name
     FROM ((({Table1}) {Table2}){Table3}){Table4};
     """
+    
+    """
     for Criteria in metadata:
         if Criteria.get("Historique") == '1':
-            SCD2(DatabaseObject,
+            SCD2(DataBaseWH,
                  "track_dim",
                  Criteria.get("ColumnName"))
+    """
+
+    data=DataBaseOp._RetrieveData(request)
+    return data
+    
+def CreateInvoiceDim(DataBaseOp, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    request="""SELECT invoiceid,
+    billingaddress,
+    billingcity,
+    billingstate,
+    billingcountry,
+    billingpostalcode,
+    Total 
+    FROM Invoice;"""
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    return data
+    
+
+def CreateCustomerDim(DataBaseOp, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    request="""SELECT customerid,
+    firstname,
+    lastname,
+    company,
+    address,
+    city,
+    state,
+    country,
+    postalcode,
+    phone,
+    fax,
+    email
+    supportrepid
+    FROM Invoice;"""
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    return data
             
             
-            
-            
-    return 
+    
 
 
 

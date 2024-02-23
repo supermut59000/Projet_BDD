@@ -39,7 +39,9 @@ class DataBaseHandler:
         except OperationalError:
             print('Error on request',request)
         return data
-    
+
+        
+
     def _ExecuteRequest(self, request: str):
         try:
             self.cur.execute(request)
@@ -68,6 +70,10 @@ class DataBaseHandler:
         return Exist
 
     
+
+    
+
+
     
     
         
