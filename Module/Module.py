@@ -80,7 +80,9 @@ def CreateTrackTable(DataBaseOp, metadata=[]):
     data=DataBaseOp._RetrieveData(request)
     return data
     
-def CreateInvoiceDim(DataBaseOp, metadata=[]):
+def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
+    
+    ###Récupération des données de la base OP###
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     request="""SELECT invoiceid,
@@ -100,6 +102,13 @@ def CreateInvoiceDim(DataBaseOp, metadata=[]):
                  Criteria.get("ColumnName"))
     """
     data=DataBaseOp._RetrieveData(request)
+    
+    ###Implémentation de la dimension INVOICE ####
+    
+    for d in data : 
+        DWH.cur.execute("INSERT INTO invoice_dim (invoice_id, billing_address, billing_city, billing_state, billing_country, billing_postal_code, total) VALUES (?,?,?,?,?,?,?)", d)
+    
+    
     return data
     
 
@@ -129,6 +138,7 @@ def CreateCustomerDim(DataBaseOp, metadata=[]):
                  Criteria.get("ColumnName"))
     """
     data=DataBaseOp._RetrieveData(request)
+    
     return data
             
             

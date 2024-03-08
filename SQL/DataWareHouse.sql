@@ -1,13 +1,12 @@
 CREATE TABLE invoice_dim(
-   TPK_invoice COUNTER,
+   TPK_invoice INTEGER PRIMARY KEY AUTOINCREMENT,
    invoice_id INT NOT NULL,
    billing_address VARCHAR(50),
    billing_city VARCHAR(50),
    billing_state VARCHAR(50),
    billing_country VARCHAR(50),
    billing_postal_code VARCHAR(50),
-   total INT,
-   PRIMARY KEY(TPK_invoice)
+   total INT
 );
 
 CREATE TABLE track_dim(
