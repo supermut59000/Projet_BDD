@@ -1,2 +1,5 @@
 # ignore all files in any directory named build
 Module/__pycache__/
+
+# ignore all .a files
+*.db
