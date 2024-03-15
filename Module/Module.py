@@ -112,23 +112,23 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     return data
     
 
-def CreateCustomerDim(DataBaseOp, metadata=[]):
+def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
-    request="""SELECT customerid,
-    firstname,
-    lastname,
-    company,
-    address,
-    city,
-    state,
-    country,
-    postalcode,
-    phone,
-    fax,
-    email
-    supportrepid
-    FROM Invoice;"""
+    request="""SELECT CustomerId,
+    FirstName,
+    LastName,
+    Company,
+    Address,
+    City,
+    State,
+    Country,
+    PostalCode,
+    Phone,
+    Fax,
+    Email,
+    SupportRepId
+    FROM Customer;"""
     
     """
     for Criteria in metadata:
@@ -138,6 +138,11 @@ def CreateCustomerDim(DataBaseOp, metadata=[]):
                  Criteria.get("ColumnName"))
     """
     data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation customer
+    
+    for d in data : 
+        DWH.cur.execute("INSERT INTO customer_dim (customer_id, first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email, support_rep_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d)
     
     return data
             
