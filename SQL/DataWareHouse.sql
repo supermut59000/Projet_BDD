@@ -1,43 +1,27 @@
-/*******************************************************************************
-   Drop Tables
-********************************************************************************/
-DROP TABLE IF EXISTS [invoice_dim];
-
-DROP TABLE IF EXISTS [track_dim];
-
-DROP TABLE IF EXISTS [date_dim];
-
-DROP TABLE IF EXISTS [customer_dim];
-
-DROP TABLE IF EXISTS [invoice_fact];
-
-/*******************************************************************************
-   Create Tables
-********************************************************************************/
-
 CREATE TABLE invoice_dim(
-   invoice_id INT,
+   TPK_invoice INTEGER PRIMARY KEY AUTOINCREMENT,
+   invoice_id INT NOT NULL,
    billing_address VARCHAR(50),
    billing_city VARCHAR(50),
    billing_state VARCHAR(50),
    billing_country VARCHAR(50),
    billing_postal_code VARCHAR(50),
-   total INT,
-   PRIMARY KEY(invoice_id)
+   total INT
 );
 
 CREATE TABLE track_dim(
-   track_id INT,
+   TPK_track COUNTER,
+   track_id INT NOT NULL,
    name VARCHAR(50),
    composer VARCHAR(50),
    milliseconds INT,
    bytes INT,
-   unit_price INT,
+   unit_price DECIMAL(15,2),
    media_type VARCHAR(50),
    genre VARCHAR(50),
    album VARCHAR(50),
    artist VARCHAR(50),
-   PRIMARY KEY(track_id)
+   PRIMARY KEY(TPK_track)
 );
 
 CREATE TABLE date_dim(
@@ -55,7 +39,8 @@ CREATE TABLE date_dim(
 );
 
 CREATE TABLE customer_dim(
-   customer_id INT,
+   TPK_customer COUNTER,
+   customer_id INT NOT NULL,
    first_name VARCHAR(50),
    last_name VARCHAR(50),
    company VARCHAR(50),
@@ -68,20 +53,40 @@ CREATE TABLE customer_dim(
    fax VARCHAR(50),
    email VARCHAR(50),
    support_rep_id INT,
-   PRIMARY KEY(customer_id)
+   PRIMARY KEY(TPK_customer)
+);
+
+CREATE TABLE employe_dim(
+   TPK_employe COUNTER,
+   EmployeeId INT NOT NULL,
+   LastName VARCHAR(50),
+   FirstName VARCHAR(50),
+   Title VARCHAR(50),
+   BirthDate VARCHAR(50),
+   HireDate VARCHAR(50),
+   Address VARCHAR(50),
+   City VARCHAR(50),
+   State VARCHAR(50),
+   Country VARCHAR(50),
+   PostalCode VARCHAR(50),
+   Phone VARCHAR(50),
+   Fax VARCHAR(50),
+   Email VARCHAR(50),
+   PRIMARY KEY(TPK_employe)
 );
 
 CREATE TABLE invoice_fact(
-   invoice_line_id INT,
-   unit_price INT,
+   invoice_line_id COUNTER,
    quantity INT,
-   customer_id INT,
-   track_id INT,
+   TPK_customer INT,
+   TPK_track INT,
    date_id INT,
-   invoice_id INT,
+   TPK_invoice INT,
+   TPK_employe INT,
    PRIMARY KEY(invoice_line_id),
-   FOREIGN KEY(customer_id) REFERENCES customer_dim(customer_id),
-   FOREIGN KEY(track_id) REFERENCES track_dim(track_id),
+   FOREIGN KEY(TPK_customer) REFERENCES customer_dim(TPK_customer),
+   FOREIGN KEY(TPK_track) REFERENCES track_dim(TPK_track),
    FOREIGN KEY(date_id) REFERENCES date_dim(date_id),
-   FOREIGN KEY(invoice_id) REFERENCES invoice_dim(invoice_id)
+   FOREIGN KEY(TPK_invoice) REFERENCES invoice_dim(TPK_invoice),
+   FOREIGN KEY(TPK_employe) REFERENCES employe_dim(TPK_employe)
 );
