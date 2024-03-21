@@ -18,9 +18,9 @@ try:
     Module.CreateMetadata(DataWareHouse)
     SCDData = Module.ReadMetadata()
     #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
-    #Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, track_dim_metadata)
+    data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=[])
     #data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=[])
-    data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=[])
+    #data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=[])
     
 except Exception as error:
     print("Cassé", error)

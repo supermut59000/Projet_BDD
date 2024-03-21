@@ -57,7 +57,7 @@ def create_date_table(start='1990-01-01', end='2099-12-31'):
     return df
 
 
-def CreateTrackTable(DataBaseOp, metadata=[]):
+def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     Table1 = "source.Track LEFT JOIN source.Genre ON source.Track.GenreId = source.Genre.GenreId"
@@ -78,6 +78,15 @@ def CreateTrackTable(DataBaseOp, metadata=[]):
     """
 
     data=DataBaseOp._RetrieveData(request)
+    
+    ###Implémentation de la dimension INVOICE ####
+    
+    
+    DWH.cur.execute('ATTACH DATABASE DWH.DB AS source')
+    request='select * from track_dim'
+    data=DataBaseOp._RetrieveData(request)
+    
+    
     return data
     
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
@@ -146,7 +155,39 @@ def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     
     return data
             
-            
+
+def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    coltemp=path.GetColumnFromTable("Employee")
+    col=[]
+    for c in coltemp:
+        col.append(c[0])
+        
+    columns = ', '.join(col)  # Concaténation des noms de colonnes
+
+    request = f"SELECT {columns} FROM Employee;"
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation Employe
+    
+    DWH.cur.execute(f'ATTACH DATABASE DWH.DB AS source')
+    
+    coltemp=path.GetColumnFromTable("Employee")
+    col=[]
+    for c in coltemp:
+        col.append(c[0])
+    
+    
+
     
 
 
