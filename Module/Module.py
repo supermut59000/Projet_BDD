@@ -49,7 +49,7 @@ def ReadMetadata():
         
     return Metadatas, FileNames
 
-def create_date_table(start='1990-01-01', end='2099-12-31'):
+def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
     df['date_id'] = df.index + 1
     df['year_D'] = df.Date_D.dt.year
@@ -63,6 +63,21 @@ def create_date_table(start='1990-01-01', end='2099-12-31'):
     
     df = df[['date_id', 'Date_D', 'year_D', 'month_D', 'MonthNumberOfDay', 'day_D', 'day_name', 'day_week', 'week', 'quarter']] 
     
+    df.to_sql(name='date_dim', con=DWH.con, if_exists='replace')
+    """
+    for d in df : 
+        DWH.cur.execute(INSERT INTO date_dim (
+        date_id,
+        Date_D,
+        year_D,
+        month_D,
+        MonthNumberOfDay,
+        day_D,
+        day_name,
+        day_week,
+        week,
+        quarter) VALUES (?,?,?,?,?,?,?,?,?,?), d)
+        """
     return df
 
 
@@ -168,14 +183,21 @@ def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
 def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
-    coltemp=path.GetColumnFromTable("Employee")
-    col=[]
-    for c in coltemp:
-        col.append(c[0])
-        
-    columns = ', '.join(col)  # Concaténation des noms de colonnes
-
-    request = f"SELECT {columns} FROM Employee;"
+    request="""SELECT EmployeeId,
+    LastName,
+    FirstName,
+    Title,
+    BirthDate,
+    HireDate,
+    Address,
+    City,
+    State,
+    Country,
+    PostalCode,
+    Phone,
+    Fax,
+    Email
+    FROM Employee;"""
     
     """
     for Criteria in metadata:
@@ -186,14 +208,30 @@ def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
     """
     data=DataBaseOp._RetrieveData(request)
     
-    ###implementation Employe
+    ###implementation employe_dim
     
-    DWH.cur.execute(f'ATTACH DATABASE DWH.DB AS source')
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO employe_dim (
+        EmployeeId,
+        LastName,
+        FirstName,
+        Title,
+        BirthDate,
+        HireDate,
+        Address,
+        City,
+        State,
+        Country,
+        PostalCode,
+        Phone,
+        Fax,
+        Email) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", d)
     
-    coltemp=path.GetColumnFromTable("Employee")
-    col=[]
-    for c in coltemp:
-        col.append(c[0])
+    return data
+    
+
+
+    
     
     
 
