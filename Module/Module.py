@@ -14,6 +14,15 @@ def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(5
     
     return 
 
+def CreateInsertRequest(DatabaseObject, TableName: str):
+    coltemp=DatabaseObject.GetColumnFromTable(TableName)
+    TempList = [x[0] for x in coltemp]
+    
+    INSERT = f"INSERT INTO {TableName} "
+    COLUMNS = f"({','.join(TempList)}) "
+    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
+    return INSERT + COLUMNS + VALUES
+
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
         os.mkdir(PATH+ "/Metadata/")
@@ -57,7 +66,7 @@ def create_date_table(start='1990-01-01', end='2099-12-31'):
     return df
 
 
-def CreateTrackTable(DataBaseOp, metadata=[]):
+def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     Table1 = "source.Track LEFT JOIN source.Genre ON source.Track.GenreId = source.Genre.GenreId"
@@ -78,6 +87,15 @@ def CreateTrackTable(DataBaseOp, metadata=[]):
     """
 
     data=DataBaseOp._RetrieveData(request)
+    
+    ###Implémentation de la dimension INVOICE ####
+    
+    
+    DWH.cur.execute('ATTACH DATABASE DWH.DB AS source')
+    request='select * from track_dim'
+    data=DataBaseOp._RetrieveData(request)
+    
+    
     return data
     
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
@@ -112,23 +130,23 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     return data
     
 
-def CreateCustomerDim(DataBaseOp, metadata=[]):
+def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
-    request="""SELECT customerid,
-    firstname,
-    lastname,
-    company,
-    address,
-    city,
-    state,
-    country,
-    postalcode,
-    phone,
-    fax,
-    email
-    supportrepid
-    FROM Invoice;"""
+    request="""SELECT CustomerId,
+    FirstName,
+    LastName,
+    Company,
+    Address,
+    City,
+    State,
+    Country,
+    PostalCode,
+    Phone,
+    Fax,
+    Email,
+    SupportRepId
+    FROM Customer;"""
     
     """
     for Criteria in metadata:
@@ -139,9 +157,46 @@ def CreateCustomerDim(DataBaseOp, metadata=[]):
     """
     data=DataBaseOp._RetrieveData(request)
     
+    ###implementation customer
+    
+    for d in data : 
+        DWH.cur.execute("INSERT INTO customer_dim (customer_id, first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email, support_rep_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d)
+    
     return data
             
-            
+
+def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    coltemp=path.GetColumnFromTable("Employee")
+    col=[]
+    for c in coltemp:
+        col.append(c[0])
+        
+    columns = ', '.join(col)  # Concaténation des noms de colonnes
+
+    request = f"SELECT {columns} FROM Employee;"
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation Employe
+    
+    DWH.cur.execute(f'ATTACH DATABASE DWH.DB AS source')
+    
+    coltemp=path.GetColumnFromTable("Employee")
+    col=[]
+    for c in coltemp:
+        col.append(c[0])
+    
+    
+
     
 
 
