@@ -14,6 +14,15 @@ def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(5
     
     return 
 
+def CreateInsertRequest(DatabaseObject, TableName: str):
+    coltemp=DatabaseObject.GetColumnFromTable(TableName)
+    TempList = [x[0] for x in coltemp]
+    
+    INSERT = f"INSERT INTO {TableName} "
+    COLUMNS = f"({','.join(TempList)}) "
+    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
+    return INSERT + COLUMNS + VALUES
+
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
         os.mkdir(PATH+ "/Metadata/")

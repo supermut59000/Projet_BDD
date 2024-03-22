@@ -18,10 +18,10 @@ try:
     Module.CreateMetadata(DataWareHouse)
     SCDData = Module.ReadMetadata()
     #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
-    data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=[])
+    #data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=[])
     #data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=[])
     #data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=[])
-    
+    Module.CreateInsertRequest(DataWareHouse, "invoice_dim")
 except Exception as error:
     print("Cassé", error)
 finally:
