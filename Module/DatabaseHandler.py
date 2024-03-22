@@ -38,13 +38,45 @@ class DataBaseHandler:
             data = self.cur.execute(request).fetchall()
         except OperationalError:
             print('Error on request',request)
-        return data
-
+        return [x[0] for x in data]
+    
+    def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= []):
+        request = self._CreateInsertRequest(TableName)
+        IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
+               
         
+        for row in data:
+            AlreadyExist = False
+            for IndexId in IndexIds:
+                Exist, RowData= self._DoesThisIdExist(row[IndexId],Headers[IndexId], TableName)
+                if Exist:
+                    AlreadyExist= True
+                     
+            if AlreadyExist:
+                if row != RowData[1:]:
+                    print('a')
+                    self._ExecuteRequest(request, row)
+                    
+            else:
+                self._ExecuteRequest(request, row)
+        
+        return
 
-    def _ExecuteRequest(self, request: str):
+    
+    def _CreateInsertRequest(self, TableName):
+        coltemp= self.GetColumnFromTable(TableName)[1:]
+        
+        INSERT = f"INSERT INTO {TableName} "
+        COLUMNS = f"({','.join(coltemp)}) "
+        VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
+        return INSERT + COLUMNS + VALUES
+
+    def _ExecuteRequest(self, request: str, data=[]):
         try:
-            self.cur.execute(request)
+            if data!= []:
+                self.cur.execute(request,data)
+            else:
+                self.cur.execute(request)
         except OperationalError:
             print('Error on request',request)
             
@@ -59,15 +91,16 @@ class DataBaseHandler:
     def _DoesThisIdExist(self, Id, ColumnName:str, TableName: str):
         Exist = False
         
-        request = f"SELECT {ColumnName} FROM {TableName} WHERE {ColumnName} = {Id}"
+        request = f"SELECT * FROM {TableName} WHERE {ColumnName} = {Id}"
         try:
             data = self.cur.execute(request).fetchall()
             if data != []:
                 Exist = True
+                data = data[0]
         except OperationalError:
             print('Error on request',request)
         
-        return Exist
+        return Exist, data
 
     
 

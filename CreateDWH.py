@@ -25,7 +25,7 @@ def CreateMetadata(DatabaseObject):
         with open(PATH+ "/Metadata/"+ Table[0]+".txt", "w") as writer:
             writer.write("ColumnName,Historique\n")
             for Column in DatabaseObject.GetColumnFromTable(Table[0]):
-                TempText = f"{Column[0]},0\n"
+                TempText = f"{Column},0\n"
                 writer.write(TempText)
 
 T1 = time.time()

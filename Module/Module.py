@@ -14,15 +14,6 @@ def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(5
     
     return 
 
-def CreateInsertRequest(DatabaseObject, TableName: str):
-    coltemp=DatabaseObject.GetColumnFromTable(TableName)
-    TempList = [x[0] for x in coltemp]
-    
-    INSERT = f"INSERT INTO {TableName} "
-    COLUMNS = f"({','.join(TempList)}) "
-    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
-    return INSERT + COLUMNS + VALUES
-
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
         os.mkdir(PATH+ "/Metadata/")
@@ -34,7 +25,7 @@ def CreateMetadata(DatabaseObject):
         with open(PATH+ "/Metadata/"+ Table[0]+".txt", "w") as writer:
             writer.write("ColumnName,Historique\n")
             for Column in DatabaseObject.GetColumnFromTable(Table[0]):
-                TempText = f"{Column[0]},0\n"
+                TempText = f"{Column},0\n"
                 writer.write(TempText)
 
 def ReadMetadata():
@@ -101,8 +92,6 @@ def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     
     ###Récupération des données de la base OP###
-    path="OP.DB"
-    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     request="""SELECT invoiceid,
     billingaddress,
     billingcity,
@@ -120,12 +109,11 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
                  Criteria.get("ColumnName"))
     """
     data=DataBaseOp._RetrieveData(request)
-    
     ###Implémentation de la dimension INVOICE ####
     
-    for d in data : 
-        DWH.cur.execute("INSERT INTO invoice_dim (invoice_id, billing_address, billing_city, billing_state, billing_country, billing_postal_code, total) VALUES (?,?,?,?,?,?,?)", d)
-    
+    Headers= DWH.GetColumnFromTable('invoice_dim')
+    DWH.InsertWithSCD2('invoice_dim', data, Headers, IdsColumnsName= ['invoice_id'])
+       
     
     return data
     
