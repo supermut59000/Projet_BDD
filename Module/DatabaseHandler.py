@@ -40,10 +40,10 @@ class DataBaseHandler:
             print('Error on request',request)
         return [x[0] for x in data]
     
-    def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= []):
+    def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= [], SC2Columns= []):
+        import time
         request = self._CreateInsertRequest(TableName)
         IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
-               
         
         for row in data:
             AlreadyExist = False
@@ -53,10 +53,19 @@ class DataBaseHandler:
                     AlreadyExist= True
                      
             if AlreadyExist:
+                for Column in SC2Columns:
+                    row = list(row)
+                    if row[Column] != RowData[1:][Column]:
+                        row.append(time.time())
+                        row.append('')
+                        row.append('1')
+                    else:
+                        row.append('')
+                        row.append('')
+                        row.append('')
                 if row != RowData[1:]:
-                    print('a')
                     self._ExecuteRequest(request, row)
-                    
+                
             else:
                 self._ExecuteRequest(request, row)
         

@@ -91,6 +91,12 @@ def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    
     ###Récupération des données de la base OP###
     request="""SELECT invoiceid,
     billingaddress,
@@ -110,9 +116,13 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     """
     data=DataBaseOp._RetrieveData(request)
     ###Implémentation de la dimension INVOICE ####
+    SC2Columns = []
+    for counter, value in enumerate(metadata):
+        if value.get("Historique") == '1':
+            SC2Columns.append(counter)
     
     Headers= DWH.GetColumnFromTable('invoice_dim')
-    DWH.InsertWithSCD2('invoice_dim', data, Headers, IdsColumnsName= ['invoice_id'])
+    DWH.InsertWithSCD2('invoice_dim', data, Headers, ['invoice_id'], SC2Columns)
        
     
     return data
