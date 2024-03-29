@@ -73,7 +73,7 @@ CREATE TABLE employe_dim(
 );
 
 CREATE TABLE invoice_fact(
-   invoice_line_id INTEGER PRIMARY KEY AUTOINCREMENT,
+   invoice_line_id INTEGER PRIMARY KEY,
    quantity INT,
    TPK_customer INT,
    TPK_track INT,

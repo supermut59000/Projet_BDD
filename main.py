@@ -14,15 +14,18 @@ DataWareHouse = DataBaseHandler('DWH.db')
 
 try:
     OperationnalDatabase.executeScriptsFromFile('./SQL/Chinook_Sqlite.sql')
-    #DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
+    DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
     #Module.CreateMetadata(DataWareHouse)
     #SCDData = Module.ReadMetadata()
     #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
-    #data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=[])
+    
     #data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=[])
     #data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=[])
     #data=Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=[])
-    data=Module.create_date_table(DataWareHouse)
+    #data=Module.create_date_table(DataWareHouse)
+    #data=Module.CreateTrackTable(OperationnalDatabase, DataWareHouse, metadata=[])
+    #data=Module.CreateInvoiceFact(OperationnalDatabase, DataWareHouse, metadata=[])
+
 except Exception as error:
     print("Cassé", error)
 finally:

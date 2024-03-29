@@ -103,13 +103,20 @@ def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
 
     data=DataBaseOp._RetrieveData(request)
     
-    ###Implémentation de la dimension INVOICE ####
+    ###Implémentation de la dimension TRACK ####
     
-    
-    DWH.cur.execute('ATTACH DATABASE DWH.DB AS source')
-    request='select * from track_dim'
-    data=DataBaseOp._RetrieveData(request)
-    
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO track_dim (
+        track_id,
+        name,
+        composer,
+        milliseconds,
+        bytes,
+        unit_price,
+        media_type,
+        genre,
+        album,
+        artist) VALUES (?,?,?,?,?,?,?,?,?,?)""", d)
     
     return data
     
@@ -231,7 +238,48 @@ def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
     
 
 
+def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    request="""SELECT
+    InvoiceLine.InvoiceLineId,
+    InvoiceLine.Quantity,
+    Customer.CustomerId,
+    Track.TrackId,
+    Invoice.InvoiceDate,
+    Invoice.InvoiceId,
+    Employee.EmployeeId   
+    FROM (((((Track left join InvoiceLine on Track.TrackId = InvoiceLine.TrackId)
+          left join Invoice on InvoiceLine.InvoiceId = Invoice.InvoiceId)
+          left join Customer on Invoice.CustomerId = Customer.CustomerId)
+          left join Employee on Customer.SupportRepId = Employee.EmployeeId))
     
+ 
+    """
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation employe_dim
+    
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO invoice_fact (
+        invoice_line_id,
+        quantity,
+        TPK_customer,
+        TPK_track,
+        date_id,
+        TPK_invoice,
+        TPK_employe)
+        VALUES (?,?,?,?,?,?,?)""", d)
+    
+    return data    
     
     
 
