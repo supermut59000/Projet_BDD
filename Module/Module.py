@@ -119,7 +119,7 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     SC2Columns = []
     for counter, value in enumerate(metadata):
         if value.get("Historique") == '1':
-            SC2Columns.append(counter)
+            SC2Columns.append(counter-1)
     
     Headers= DWH.GetColumnFromTable('invoice_dim')
     DWH.InsertWithSCD2('invoice_dim', data, Headers, ['invoice_id'], SC2Columns)

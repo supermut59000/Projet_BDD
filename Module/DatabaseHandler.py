@@ -42,44 +42,87 @@ class DataBaseHandler:
         return [x[0] for x in data]
     
     def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= [], SC2Columns= []):
-        import time
         request = self._CreateInsertRequest(TableName)
         IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
         
-        for row in data[:10]:
+        for row in data:
             AlreadyExist = False
             for IndexId in IndexIds:
-                print(IndexId,row[IndexId],Headers[IndexId+1])
                 Exist, RowData= self._DoesThisIdExist(row[IndexId],Headers[IndexId+1], TableName)
                 if Exist:
                     AlreadyExist= True
+                    
             row = list(row)
             RowData = list(RowData)
+            
             if AlreadyExist:
-                for Column in SC2Columns:
+                
+                StartingSCD2Index = len(RowData)-3*len(SC2Columns)
+                
+                for counter, Column in enumerate(SC2Columns):
+                    counter+= 1
                     if row[Column] != RowData[1:][Column]:
-                        print('a')
                         row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
                         row.append('')
                         row.append('1')
+                        TPKID = self._GetLastActifEntry(TableName,
+                                                Headers,
+                                                IndexIds,
+                                                RowData,
+                                                Headers[StartingSCD2Index:StartingSCD2Index+3+1])
+                        self._CloseLastActifEntry(TableName,
+                                                  Headers,
+                                                  Headers[StartingSCD2Index:StartingSCD2Index+3+1],
+                                                  TPKID)
                     else:
-                        print('b')
                         row.append('')
                         row.append('')
                         row.append('')
+                        
+                    StartingSCD2Index += 3
                 
                 if row[:-3*len(SC2Columns)] != RowData[1:-3*len(SC2Columns)]:
                     self._ExecuteRequest(request, row)
                 
             else:
-                row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
-                row.append('')
-                row.append('1')
+                for i in range(len(SC2Columns)):
+                    row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                    row.append('')
+                    row.append('1')
                 self._ExecuteRequest(request, row)
         
         return
 
-    
+    def _CloseLastActifEntry(self, Table, Headers, SCD2Columns, TPK):
+        
+        UPDATE= f"UPDATE {Table} "
+        SET = f"""SET {SCD2Columns[1]} = '{datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}',
+        {SCD2Columns[2]} = '0' """
+        WHERE = f"WHERE {Headers[0]} = {TPK}"
+        request = UPDATE + SET + WHERE
+
+        self._ExecuteRequest(request)
+        return
+
+    def _GetLastActifEntry(self, Table, Headers, IndexIds, Row, SCD2Columns):
+        
+        #Definition des variables
+        TPKName = Headers[0]
+        Ids = [f"{Headers[x+1]} = {Row[x+1]}" for x in IndexIds]
+                
+        #Creation de la requete
+        
+        SELECT = f"SELECT {TPKName} FROM {Table} "
+        WHERE  = f"WHERE {SCD2Columns[2]} = '1' AND {'AND'.join(Ids)} "
+        ORDERBY = f"ORDER BY {SCD2Columns[0]} DESC"
+        try:
+            request = SELECT+WHERE+ORDERBY
+            data= self._RetrieveData(request)[0][0]
+        except:
+            print("Probleme pas d'entrer precedante")
+        
+        return data
+
     def _CreateInsertRequest(self, TableName):
         coltemp= self.GetColumnFromTable(TableName)[1:]
         
@@ -111,10 +154,8 @@ class DataBaseHandler:
         request = f"SELECT * FROM {TableName} WHERE {ColumnName} = {Id} ORDER BY TPK_invoice ASC;"
         try:
             data = self.cur.execute(request).fetchall()
-            print(data)
             if data != []:
                 Exist = True
-                print(data)
                 data = data[-1]
         except OperationalError:
             print('Error on request',request)
