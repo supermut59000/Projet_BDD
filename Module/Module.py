@@ -249,7 +249,7 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
     Invoice.InvoiceDate,
     Invoice.InvoiceId,
     Employee.EmployeeId   
-    FROM (((((Track left join InvoiceLine on Track.TrackId = InvoiceLine.TrackId)
+    FROM (((((Track right join InvoiceLine on Track.TrackId = InvoiceLine.TrackId)
           left join Invoice on InvoiceLine.InvoiceId = Invoice.InvoiceId)
           left join Customer on Invoice.CustomerId = Customer.CustomerId)
           left join Employee on Customer.SupportRepId = Employee.EmployeeId))
