@@ -31,10 +31,9 @@ finally:
     DataWareHouse.CloseDatabase()
     T2 = time.time()
     print(T2-T1)
-    
+
     
 ########Implémentation du DWH#########
-
 
 
 

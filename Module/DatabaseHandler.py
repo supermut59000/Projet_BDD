@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import OperationalError
+import datetime
 
 class DataBaseHandler:
     def __init__(self, databasename):
@@ -45,28 +46,35 @@ class DataBaseHandler:
         request = self._CreateInsertRequest(TableName)
         IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
         
-        for row in data:
+        for row in data[:10]:
             AlreadyExist = False
             for IndexId in IndexIds:
-                Exist, RowData= self._DoesThisIdExist(row[IndexId],Headers[IndexId], TableName)
+                print(IndexId,row[IndexId],Headers[IndexId+1])
+                Exist, RowData= self._DoesThisIdExist(row[IndexId],Headers[IndexId+1], TableName)
                 if Exist:
                     AlreadyExist= True
-                     
+            row = list(row)
+            RowData = list(RowData)
             if AlreadyExist:
                 for Column in SC2Columns:
-                    row = list(row)
                     if row[Column] != RowData[1:][Column]:
-                        row.append(time.time())
+                        print('a')
+                        row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
                         row.append('')
                         row.append('1')
                     else:
+                        print('b')
                         row.append('')
                         row.append('')
                         row.append('')
-                if row != RowData[1:]:
+                
+                if row[:-3*len(SC2Columns)] != RowData[1:-3*len(SC2Columns)]:
                     self._ExecuteRequest(request, row)
                 
             else:
+                row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                row.append('')
+                row.append('1')
                 self._ExecuteRequest(request, row)
         
         return
@@ -100,12 +108,14 @@ class DataBaseHandler:
     def _DoesThisIdExist(self, Id, ColumnName:str, TableName: str):
         Exist = False
         
-        request = f"SELECT * FROM {TableName} WHERE {ColumnName} = {Id}"
+        request = f"SELECT * FROM {TableName} WHERE {ColumnName} = {Id} ORDER BY TPK_invoice ASC;"
         try:
             data = self.cur.execute(request).fetchall()
+            print(data)
             if data != []:
                 Exist = True
-                data = data[0]
+                print(data)
+                data = data[-1]
         except OperationalError:
             print('Error on request',request)
         

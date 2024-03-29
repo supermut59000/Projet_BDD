@@ -8,7 +8,7 @@ PATH = os.getcwd()
 
 
 def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(50)"):
-    ColomnNames = ["StartTime","EndTime","IsChanged"]
+    ColomnNames = ["StartTime","EndTime","IsActif"]
     for Colomn in ColomnNames:
         DatabaseObject.AlterTable(TableName, ColumnName + Colomn, Columntype)
     
