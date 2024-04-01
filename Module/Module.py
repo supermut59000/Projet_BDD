@@ -7,14 +7,14 @@ PATH = os.getcwd()
 
 
 
-def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(50)"):
+def SCD2Boosted(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(50)"):
     ColomnNames = ["StartTime","EndTime","IsActif"]
     for Colomn in ColomnNames:
         DatabaseObject.AlterTable(TableName, ColumnName + Colomn, Columntype)
     
     return 
 
-def CreateMetadata(DatabaseObject):
+def CreateMetadataBoosted(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
         os.mkdir(PATH+ "/Metadata/")
         
@@ -28,7 +28,7 @@ def CreateMetadata(DatabaseObject):
                 TempText = f"{Column},0\n"
                 writer.write(TempText)
 
-def ReadMetadata():
+def ReadMetadataBoosted():
     FileNames = os.listdir(PATH+ "/Metadata/")
     Metadatas = []
     for FileName in FileNames:
@@ -39,6 +39,43 @@ def ReadMetadata():
         Metadatas.append(Metadata)
         
     return Metadatas, FileNames
+
+def SCD2(DatabaseObject, TableName: str, Columntype= "VARCHAR(50)"):
+    ColomnNames = ["StartTime","EndTime","IsActif"]
+    for Colomn in ColomnNames:
+        DatabaseObject.AlterTable(TableName, Colomn, Columntype)
+    
+    return 
+
+def DoesSCD2Apply(TableName: str, metadata: list):
+    DoesSCD2Apply= False
+    for Table in metadata:
+        print(Table)
+        if Table.get('TableName') == TableName and Table.get('Historique') == '1':
+            DoesSCD2Apply= True
+        
+    return DoesSCD2Apply
+
+def CreateMetadata(DatabaseObject):
+    if "Metadata" not in os.listdir(PATH):
+        os.mkdir(PATH+ "/Metadata/")
+        
+    request = "SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name;"
+    Tables = DatabaseObject._RetrieveData(request)
+
+    with open(PATH+ "/Metadata/Metadata.txt", "w") as writer:
+        writer.write("TableName,Historique\n")
+        for Table in Tables:
+            TempText = f"{Table[0]},0\n"
+            writer.write(TempText)
+
+def ReadMetadata():
+    fd = open(PATH+ "//Metadata/Metadata.txt", 'r', encoding="utf8")
+    sqlFile = [x.split(',') for x in fd.read().split("\n") if x != '']
+    fd.close()
+    Metadata = [{sqlFile[0][0]: x[0], sqlFile[0][1]: x[1]} for x in sqlFile[1:]]
+        
+    return Metadata
 
 def create_date_table(start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
@@ -90,12 +127,12 @@ def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     return data
     
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
-    
+    """
     for Criteria in metadata:
         if Criteria.get("Historique") == '1':
-            SCD2(DWH,
+            SCD2Boosted(DWH,
                  "invoice_dim",
-                 Criteria.get("ColumnName"))
+                 Criteria.get("ColumnName"))"""
     
     ###Récupération des données de la base OP###
     request="""SELECT invoiceid,
@@ -107,22 +144,19 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     Total 
     FROM Invoice;"""
     
-    """
-    for Criteria in metadata:
-        if Criteria.get("Historique") == '1':
-            SCD2(DataBaseWH,
-                 "invoice_dim",
-                 Criteria.get("ColumnName"))
-    """
     data=DataBaseOp._RetrieveData(request)
+
     ###Implémentation de la dimension INVOICE ####
     SC2Columns = []
     for counter, value in enumerate(metadata):
         if value.get("Historique") == '1':
             SC2Columns.append(counter-1)
-    
+
+    SCD2Apply = DoesSCD2Apply('invoice_dim', metadata)
+    if SCD2Apply:
+        SCD2(DWH, 'invoice_dim')
     Headers= DWH.GetColumnFromTable('invoice_dim')
-    DWH.InsertWithSCD2('invoice_dim', data, Headers, ['invoice_id'], SC2Columns)
+    DWH.InsertWithSCD2('invoice_dim', data, Headers, ['invoice_id'])
        
     
     return data

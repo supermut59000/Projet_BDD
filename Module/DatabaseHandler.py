@@ -41,7 +41,7 @@ class DataBaseHandler:
             print('Error on request',request)
         return [x[0] for x in data]
     
-    def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= [], SC2Columns= []):
+    def InsertWithSCD2Boosted(self, TableName, data, Headers, IdsColumnsName= [], SC2Columns= []):
         request = self._CreateInsertRequest(TableName)
         IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
         
@@ -93,6 +93,52 @@ class DataBaseHandler:
         
         return
 
+    def InsertWithSCD2(self, TableName, data, Headers, IdsColumnsName= []):
+        request = self._CreateInsertRequest(TableName)
+        IndexIds = [Headers.index(x)-1 for x in IdsColumnsName]
+        
+        for row in data:
+            AlreadyExist = False
+            for IndexId in IndexIds:
+                Exist, RowData= self._DoesThisIdExist(row[IndexId],Headers[IndexId+1], TableName)
+                if Exist:
+                    AlreadyExist= True
+                    
+            row = list(row)
+            RowData = list(RowData)
+            
+            if AlreadyExist:
+                
+                StartingSCD2Index = len(RowData)-3
+
+                if row != RowData[1:-3]:
+                    row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                    row.append('')
+                    row.append('1')
+                    TPKID = self._GetLastActifEntry(TableName,
+                                                Headers,
+                                                IndexIds,
+                                                RowData,
+                                                Headers[StartingSCD2Index:StartingSCD2Index+3])
+                    
+                    self._CloseLastActifEntry(TableName,
+                                                  Headers,
+                                                  Headers[StartingSCD2Index:StartingSCD2Index+3],
+                                                  TPKID)
+                        
+                    
+                if row != RowData[1:-3]:
+                    self._ExecuteRequest(request, row)
+                
+            else:
+                
+                row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                row.append('')
+                row.append('1')
+                self._ExecuteRequest(request, row)
+        
+        return
+
     def _CloseLastActifEntry(self, Table, Headers, SCD2Columns, TPK):
         
         UPDATE= f"UPDATE {Table} "
@@ -118,10 +164,10 @@ class DataBaseHandler:
         try:
             request = SELECT+WHERE+ORDERBY
             data= self._RetrieveData(request)[0][0]
+            return data
         except:
             print("Probleme pas d'entrer precedante")
         
-        return data
 
     def _CreateInsertRequest(self, TableName):
         coltemp= self.GetColumnFromTable(TableName)[1:]

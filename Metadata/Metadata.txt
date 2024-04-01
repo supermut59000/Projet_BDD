@@ -1,0 +1,8 @@
+TableName,Historique
+customer_dim,0
+date_dim,0
+employe_dim,0
+invoice_dim,1
+invoice_fact,0
+sqlite_sequence,0
+track_dim,0

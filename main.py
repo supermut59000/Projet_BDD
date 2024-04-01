@@ -17,10 +17,10 @@ try:
     #DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
     #Module.CreateMetadata(DataWareHouse)
     SCDData = Module.ReadMetadata()
-    InvoiceMetadata = SCDData[0][SCDData[1].index('invoice_dim.txt')]
+    #InvoiceMetadata = SCDData[0][SCDData[1].index('invoice_dim.txt')]
     #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
     #data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=[])
-    data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=InvoiceMetadata)
+    data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     #data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=[])
     
     
