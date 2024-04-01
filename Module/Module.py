@@ -15,7 +15,6 @@ def SCD2(DatabaseObject, TableName: str, Columntype= "VARCHAR(50)"):
     
     return 
 
-<<<<<<< HEAD
 def DoesSCD2Apply(TableName: str, metadata: list):
     DoesSCD2Apply= False
     for Table in metadata:
@@ -23,16 +22,7 @@ def DoesSCD2Apply(TableName: str, metadata: list):
             DoesSCD2Apply= True
         
     return DoesSCD2Apply
-=======
-def CreateInsertRequest(DatabaseObject, TableName: str):
-    coltemp=DatabaseObject.GetColumnFromTable(TableName)
-    TempList = [x[0] for x in coltemp]
-    
-    INSERT = f"INSERT INTO {TableName} "
-    COLUMNS = f"({','.join(TempList)}) "
-    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
-    return INSERT + COLUMNS + VALUES
->>>>>>> ce74307c829bacf64782af36c366565b18568d9d
+
 
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
