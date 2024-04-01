@@ -1,5 +1,5 @@
 import time
-
+import asyncio
 import sys
 sys.path.insert(1, ".//Module//")
 
@@ -14,12 +14,22 @@ DataWareHouse = DataBaseHandler('DWH.db')
 
 try:
     #OperationnalDatabase.executeScriptsFromFile('./SQL/Chinook_Sqlite.sql')
-    DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
+    #DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
     #Module.CreateMetadata(DataWareHouse)
+    
     SCDData = Module.ReadMetadata()
-    #track_dim_metadata = SCDData[0][SCDData[1].index("track_dim.txt")]
-    #Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, track_dim_metadata)
-    data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=[])
+    asyncio.run(Module.create_date_table(DataWareHouse))
+
+    data=asyncio.run(Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    
+    data=asyncio.run(Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    
+    data=asyncio.run(Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    
+    data=asyncio.run(Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    
+    asyncio.run(Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse))
+    
 except Exception as error:
     print("Cassé", error)
 finally:
