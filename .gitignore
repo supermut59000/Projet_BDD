@@ -3,3 +3,6 @@ Module/__pycache__/
 
 # ignore all .a files
 *.db
+
+# ignore all files in any directory named build
+Metadata/
