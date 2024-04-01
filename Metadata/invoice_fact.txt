@@ -1,8 +1,0 @@
-ColumnName,Historique
-invoice_line_id,0
-quantity,0
-TPK_customer,0
-TPK_track,0
-date_id,0
-TPK_invoice,0
-TPK_employe,0
