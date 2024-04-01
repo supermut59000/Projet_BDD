@@ -15,6 +15,7 @@ def SCD2(DatabaseObject, TableName: str, Columntype= "VARCHAR(50)"):
     
     return 
 
+<<<<<<< HEAD
 def DoesSCD2Apply(TableName: str, metadata: list):
     DoesSCD2Apply= False
     for Table in metadata:
@@ -22,6 +23,16 @@ def DoesSCD2Apply(TableName: str, metadata: list):
             DoesSCD2Apply= True
         
     return DoesSCD2Apply
+=======
+def CreateInsertRequest(DatabaseObject, TableName: str):
+    coltemp=DatabaseObject.GetColumnFromTable(TableName)
+    TempList = [x[0] for x in coltemp]
+    
+    INSERT = f"INSERT INTO {TableName} "
+    COLUMNS = f"({','.join(TempList)}) "
+    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
+    return INSERT + COLUMNS + VALUES
+>>>>>>> ce74307c829bacf64782af36c366565b18568d9d
 
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
@@ -43,6 +54,7 @@ def ReadMetadata():
     Metadata = [{sqlFile[0][0]: x[0], sqlFile[0][1]: x[1]} for x in sqlFile[1:]]
         
     return Metadata
+
 
 async def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
@@ -76,6 +88,7 @@ async def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
     return df
 
 
+
 async def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     TableName = 'track_dim'
     path="OP.DB"
@@ -106,21 +119,8 @@ async def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
         SCD2(DWH, TableName)
     Headers= DWH.GetColumnFromTable(TableName)
     DWH.InsertWithSCD2(TableName, data, Headers, ['track_id'], SCD2Apply)
-    '''
-    for d in data : 
-        DWH.cur.execute("""INSERT INTO track_dim (
-        track_id,
-        name,
-        composer,
-        milliseconds,
-        bytes,
-        unit_price,
-        media_type,
-        genre,
-        album,
-        artist) VALUES (?,?,?,?,?,?,?,?,?,?)""", d)
-    '''
-    return data
+    
+
     
 async def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     TableName = 'invoice_dim'
@@ -197,6 +197,7 @@ async def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     return data
             
 
+
 async def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
     TableName = 'employe_dim'
     path="OP.DB"
@@ -233,26 +234,11 @@ async def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
         SCD2(DWH, TableName)
     Headers= DWH.GetColumnFromTable(TableName)
     DWH.InsertWithSCD2(TableName, data, Headers, ['EmployeeId'], SCD2Apply)
-    '''
-    for d in data : 
-        DWH.cur.execute("""INSERT INTO employe_dim (
-        EmployeeId,
-        LastName,
-        FirstName,
-        Title,
-        BirthDate,
-        HireDate,
-        Address,
-        City,
-        State,
-        Country,
-        PostalCode,
-        Phone,
-        Fax,
-        Email) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", d)
-    '''
+    
+
     return data
     
+
 
 
 async def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
@@ -297,7 +283,7 @@ async def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
         VALUES (?,?,?,?,?,?,?)""", d)
     
     return data    
-            
+
     
 
 

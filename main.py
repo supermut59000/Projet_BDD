@@ -39,9 +39,8 @@ finally:
     print(T2-T1)
     
     
+    
 ########Implémentation du DWH#########
-
-
 
 
 
