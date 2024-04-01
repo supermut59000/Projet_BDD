@@ -10,7 +10,7 @@ CREATE TABLE invoice_dim(
 );
 
 CREATE TABLE track_dim(
-   TPK_track COUNTER,
+   TPK_track INTEGER PRIMARY KEY AUTOINCREMENT,
    track_id INT NOT NULL,
    name VARCHAR(50),
    composer VARCHAR(50),
@@ -20,8 +20,7 @@ CREATE TABLE track_dim(
    media_type VARCHAR(50),
    genre VARCHAR(50),
    album VARCHAR(50),
-   artist VARCHAR(50),
-   PRIMARY KEY(TPK_track)
+   artist VARCHAR(50)
 );
 
 CREATE TABLE date_dim(
@@ -39,7 +38,7 @@ CREATE TABLE date_dim(
 );
 
 CREATE TABLE customer_dim(
-   TPK_customer COUNTER,
+   TPK_customer INTEGER PRIMARY KEY AUTOINCREMENT,
    customer_id INT NOT NULL,
    first_name VARCHAR(50),
    last_name VARCHAR(50),
@@ -52,12 +51,11 @@ CREATE TABLE customer_dim(
    phone VARCHAR(50),
    fax VARCHAR(50),
    email VARCHAR(50),
-   support_rep_id INT,
-   PRIMARY KEY(TPK_customer)
+   support_rep_id INT
 );
 
 CREATE TABLE employe_dim(
-   TPK_employe COUNTER,
+   TPK_employe INTEGER PRIMARY KEY AUTOINCREMENT,
    EmployeeId INT NOT NULL,
    LastName VARCHAR(50),
    FirstName VARCHAR(50),
@@ -71,19 +69,18 @@ CREATE TABLE employe_dim(
    PostalCode VARCHAR(50),
    Phone VARCHAR(50),
    Fax VARCHAR(50),
-   Email VARCHAR(50),
-   PRIMARY KEY(TPK_employe)
+   Email VARCHAR(50)
 );
 
 CREATE TABLE invoice_fact(
-   invoice_line_id COUNTER,
+   TPK_FACT INTEGER PRIMARY KEY AUTOINCREMENT,
+   invoice_line_id INT,
    quantity INT,
    TPK_customer INT,
    TPK_track INT,
    date_id INT,
    TPK_invoice INT,
    TPK_employe INT,
-   PRIMARY KEY(invoice_line_id),
    FOREIGN KEY(TPK_customer) REFERENCES customer_dim(TPK_customer),
    FOREIGN KEY(TPK_track) REFERENCES track_dim(TPK_track),
    FOREIGN KEY(date_id) REFERENCES date_dim(date_id),

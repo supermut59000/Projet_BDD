@@ -14,6 +14,15 @@ def SCD2(DatabaseObject, TableName: str, ColumnName: str, Columntype= "VARCHAR(5
     
     return 
 
+def CreateInsertRequest(DatabaseObject, TableName: str):
+    coltemp=DatabaseObject.GetColumnFromTable(TableName)
+    TempList = [x[0] for x in coltemp]
+    
+    INSERT = f"INSERT INTO {TableName} "
+    COLUMNS = f"({','.join(TempList)}) "
+    VALUES = f"VALUES ({','.join(['?' for x in coltemp])});"
+    return INSERT + COLUMNS + VALUES
+
 def CreateMetadata(DatabaseObject):
     if "Metadata" not in os.listdir(PATH):
         os.mkdir(PATH+ "/Metadata/")
@@ -40,7 +49,7 @@ def ReadMetadata():
         
     return Metadatas, FileNames
 
-def create_date_table(start='1990-01-01', end='2099-12-31'):
+def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
     df['date_id'] = df.index + 1
     df['year_D'] = df.Date_D.dt.year
@@ -54,10 +63,25 @@ def create_date_table(start='1990-01-01', end='2099-12-31'):
     
     df = df[['date_id', 'Date_D', 'year_D', 'month_D', 'MonthNumberOfDay', 'day_D', 'day_name', 'day_week', 'week', 'quarter']] 
     
+    df.to_sql(name='date_dim', con=DWH.con, if_exists='replace')
+    """
+    for d in df : 
+        DWH.cur.execute(INSERT INTO date_dim (
+        date_id,
+        Date_D,
+        year_D,
+        month_D,
+        MonthNumberOfDay,
+        day_D,
+        day_name,
+        day_week,
+        week,
+        quarter) VALUES (?,?,?,?,?,?,?,?,?,?), d)
+        """
     return df
 
 
-def CreateTrackTable(DataBaseOp, metadata=[]):
+def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     Table1 = "source.Track LEFT JOIN source.Genre ON source.Track.GenreId = source.Genre.GenreId"
@@ -78,6 +102,22 @@ def CreateTrackTable(DataBaseOp, metadata=[]):
     """
 
     data=DataBaseOp._RetrieveData(request)
+    
+    ###Implémentation de la dimension TRACK ####
+    
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO track_dim (
+        track_id,
+        name,
+        composer,
+        milliseconds,
+        bytes,
+        unit_price,
+        media_type,
+        genre,
+        album,
+        artist) VALUES (?,?,?,?,?,?,?,?,?,?)""", d)
+    
     return data
     
 def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
@@ -112,23 +152,23 @@ def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     return data
     
 
-def CreateCustomerDim(DataBaseOp, metadata=[]):
+def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     path="OP.DB"
     DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
-    request="""SELECT customerid,
-    firstname,
-    lastname,
-    company,
-    address,
-    city,
-    state,
-    country,
-    postalcode,
-    phone,
-    fax,
-    email
-    supportrepid
-    FROM Invoice;"""
+    request="""SELECT CustomerId,
+    FirstName,
+    LastName,
+    Company,
+    Address,
+    City,
+    State,
+    Country,
+    PostalCode,
+    Phone,
+    Fax,
+    Email,
+    SupportRepId
+    FROM Customer;"""
     
     """
     for Criteria in metadata:
@@ -139,9 +179,110 @@ def CreateCustomerDim(DataBaseOp, metadata=[]):
     """
     data=DataBaseOp._RetrieveData(request)
     
+    ###implementation customer
+    
+    for d in data : 
+        DWH.cur.execute("INSERT INTO customer_dim (customer_id, first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email, support_rep_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d)
+    
     return data
             
-            
+
+def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    request="""SELECT EmployeeId,
+    LastName,
+    FirstName,
+    Title,
+    BirthDate,
+    HireDate,
+    Address,
+    City,
+    State,
+    Country,
+    PostalCode,
+    Phone,
+    Fax,
+    Email
+    FROM Employee;"""
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation employe_dim
+    
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO employe_dim (
+        EmployeeId,
+        LastName,
+        FirstName,
+        Title,
+        BirthDate,
+        HireDate,
+        Address,
+        City,
+        State,
+        Country,
+        PostalCode,
+        Phone,
+        Fax,
+        Email) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", d)
+    
+    return data
+    
+
+
+def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
+    path="OP.DB"
+    DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    request="""SELECT
+    InvoiceLine.InvoiceLineId,
+    InvoiceLine.Quantity,
+    Customer.CustomerId,
+    Track.TrackId,
+    Invoice.InvoiceDate,
+    Invoice.InvoiceId,
+    Employee.EmployeeId   
+    FROM (((((Track right join InvoiceLine on Track.TrackId = InvoiceLine.TrackId)
+          left join Invoice on InvoiceLine.InvoiceId = Invoice.InvoiceId)
+          left join Customer on Invoice.CustomerId = Customer.CustomerId)
+          left join Employee on Customer.SupportRepId = Employee.EmployeeId))
+    
+ 
+    """
+    
+    """
+    for Criteria in metadata:
+        if Criteria.get("Historique") == '1':
+            SCD2(DataBaseWH,
+                 "invoice_dim",
+                 Criteria.get("ColumnName"))
+    """
+    data=DataBaseOp._RetrieveData(request)
+    
+    ###implementation employe_dim
+    
+    for d in data : 
+        DWH.cur.execute("""INSERT INTO invoice_fact (
+        invoice_line_id,
+        quantity,
+        TPK_customer,
+        TPK_track,
+        date_id,
+        TPK_invoice,
+        TPK_employe)
+        VALUES (?,?,?,?,?,?,?)""", d)
+    
+    return data    
+    
+    
+
     
 
 
