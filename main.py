@@ -18,17 +18,17 @@ try:
     #Module.CreateMetadata(DataWareHouse)
     
     SCDData = Module.ReadMetadata()
-    asyncio.run(Module.create_date_table(DataWareHouse))
+    Module.create_date_table(DataWareHouse)
 
-    data=asyncio.run(Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
-    data=asyncio.run(Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
-    data=asyncio.run(Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
-    data=asyncio.run(Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData))
+    data=Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
-    asyncio.run(Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse))
+    Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse)
     
 except Exception as error:
     print("Cassé", error)

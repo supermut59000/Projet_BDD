@@ -46,7 +46,7 @@ def ReadMetadata():
     return Metadata
 
 
-async def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
+def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
     df = pd.DataFrame({'Date_D': pd.date_range(start, end)})
     df['date_id'] = df.index + 1
     df['year_D'] = df.Date_D.dt.year
@@ -79,7 +79,7 @@ async def create_date_table(DWH,start='1990-01-01', end='2099-12-31'):
 
 
 
-async def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
+def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     TableName = 'track_dim'
     path="OP.DB"
     #DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
@@ -112,7 +112,7 @@ async def CreateTrackTable(DataBaseOp, DWH, metadata=[]):
     
 
     
-async def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
+def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     TableName = 'invoice_dim'
     ###Récupération des données de la base OP###
     path="OP.DB"
@@ -146,7 +146,7 @@ async def CreateInvoiceDim(DataBaseOp,DWH, metadata=[]):
     return data
     
 
-async def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
+def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
     TableName = 'customer_dim'
     path="OP.DB"
     #DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
@@ -188,7 +188,7 @@ async def CreateCustomerDim(DataBaseOp, DWH,  metadata=[]):
             
 
 
-async def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
+def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
     TableName = 'employe_dim'
     path="OP.DB"
     #DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
@@ -231,7 +231,7 @@ async def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
 
 
 
-async def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
+def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
     path="OP.DB"
     #DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
     request="""SELECT
