@@ -232,8 +232,14 @@ def CreateEmployeDim(DataBaseOp, DWH, metadata=[]):
 
 
 def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
+    TableName = 'invoice_fact'
+    
     path="OP.DB"
     #DataBaseOp.cur.execute(f'ATTACH DATABASE "{path}" AS source')
+    TempWHERE = []
+    for Table in metadata:
+        if Table.get('Historique') == '1':
+            TempWHERE.append(f" { Table.get('TableName')}.IsActif = '1' ")
     request="""SELECT
     InvoiceLine.InvoiceLineId,
     InvoiceLine.Quantity,
@@ -246,22 +252,55 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
           left join Invoice on InvoiceLine.InvoiceId = Invoice.InvoiceId)
           left join Customer on Invoice.CustomerId = Customer.CustomerId)
           left join Employee on Customer.SupportRepId = Employee.EmployeeId))
-    
- 
     """
     
-    """
-    for Criteria in metadata:
-        if Criteria.get("Historique") == '1':
-            SCD2(DataBaseWH,
-                 "invoice_dim",
-                 Criteria.get("ColumnName"))
-    """
-    data=DataBaseOp._RetrieveData(request)
     
+    OperationnalData=DataBaseOp._RetrieveData(request)
+    
+    Headers= DWH.GetColumnFromTable(TableName)
+    IdsColumnsName = [{'TableName' : 'customer_dim', 'IdColumn' : 'customer_id'},
+                      {'TableName' : 'track_dim', 'IdColumn' : 'track_id'},
+                      {'TableName' : 'invoice_dim', 'IdColumn' : 'invoice_id'},
+                      {'TableName' : 'employe_dim', 'IdColumn' : 'EmployeeId'}]
+    
+    
+    for OperationnalFact in OperationnalData:
+        DicTemp = {'InvoiceLineId':OperationnalFact[0],
+                   'Quantity':OperationnalFact[1],
+                   'customer_id':OperationnalFact[2],
+                   'track_id':OperationnalFact[3],
+                   'InvoiceDate':OperationnalFact[4],
+                   'invoice_id':OperationnalFact[5],
+                   'EmployeeId':OperationnalFact[6]}
+        
+        DimensionalKeys = ['customer_id','track_id','invoice_id','EmployeeId']
+    
+        TPKs = DWH.InsertFactWithSCD2(TableName, OperationnalFact, Headers, IdsColumnsName, DicTemp, metadata)
+        INSERT = """INSERT INTO invoice_fact(
+        invoice_line_id,
+        quantity,
+        TPK_customer,
+        TPK_track,
+        date_id,
+        TPK_invoice,
+        TPK_employe) VALUES (?,?,?,?,?,?,?)"""
+        Data = [
+            DicTemp.get('InvoiceLineId'),
+            DicTemp.get('Quantity'),
+            TPKs.get('customer_id'),
+            TPKs.get('track_id'),
+            DicTemp.get('InvoiceDate'),
+            TPKs.get('invoice_id'),
+            TPKs.get('EmployeeId')]
+        
+        
     ###implementation employe_dim
     
-    for d in data : 
+    
+    'WHERE ' +  ' AND '.join(TempWHERE)
+    
+    
+    for d in OperationnalData : 
         DWH.cur.execute("""INSERT INTO invoice_fact (
         invoice_line_id,
         quantity,
@@ -272,7 +311,7 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
         TPK_employe)
         VALUES (?,?,?,?,?,?,?)""", d)
     
-    return data    
+    return OperationnalData    
 
     
 

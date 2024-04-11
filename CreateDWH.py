@@ -20,13 +20,12 @@ def CreateMetadata(DatabaseObject):
         
     request = "SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name;"
     Tables = DatabaseObject._RetrieveData(request)
-    
-    for Table in Tables:
-        with open(PATH+ "/Metadata/"+ Table[0]+".txt", "w") as writer:
-            writer.write("ColumnName,Historique\n")
-            for Column in DatabaseObject.GetColumnFromTable(Table[0]):
-                TempText = f"{Column[0]},0\n"
-                writer.write(TempText)
+
+    with open(PATH+ "/Metadata/Metadata.txt", "w") as writer:
+        writer.write("TableName,Historique\n")
+        for Table in Tables:
+            TempText = f"{Table[0]},0\n"
+            writer.write(TempText)
 
 T1 = time.time()
 

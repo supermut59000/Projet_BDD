@@ -92,8 +92,67 @@ class DataBaseHandler:
                     self._ExecuteRequest(request, row)
         
         return
+    
+    def InsertFactWithSCD2(self, TableName, data, FactHeaders, IdsColumnsName, IDs, metadata):
+        Tables = [x for x in self.GetTableFromDatabase() if x not in ['date_dim','invoice_fact']]
+        Dic = {}
+        for Table in Tables:
+            
+            SCD2Indicator = [x.get('Historique') for x in metadata if x.get('TableName') == Table][0]
+            Headers= self.GetColumnFromTable(Table)
+            TableNPK = [x.get('IdColumn') for x in IdsColumnsName if x.get('TableName') == Table][0]
+            IndexIds = Headers.index(TableNPK)
+            ID = IDs.get(TableNPK)
+            if SCD2Indicator == '1':
+                TPKID = self._GetActiveTPKForANPK(Table,
+                                            Headers,
+                                            IndexIds,
+                                            ID,
+                                            Headers[-3:])
+            else:
+                
+                TPKID = self._GetActiveTPKForANPK(Table,
+                                            Headers,
+                                            IndexIds,
+                                            ID)
+            Dic[TableNPK] = TPKID
+        
+            
 
+        return Dic
+    
+    def GetTableFromDatabase(self):
+        request = "SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name;"
+        Tables = self._RetrieveData(request)
+        return [x[0]for x in Tables if x[0] != 'sqlite_sequence']
+    
+    
+    def _GetActiveTPKForANPK(self, Table, Headers, IndexIds, ID, SCD2Columns = []):
+        
+        #Definition des variables
+        TPKName = Headers[0]
+        Ids = f"{Headers[IndexIds]} = {ID}"
 
+        #Creation de la requete
+        if SCD2Columns != []:
+            SELECT = f"SELECT {TPKName} FROM {Table} "
+            WHERE  = f"WHERE {SCD2Columns[2]} = '1' AND {Ids} "
+        else:
+            SELECT = f"SELECT {TPKName} FROM {Table} "
+            WHERE  = f"WHERE {Ids} "
+        
+        try:
+            request = SELECT+WHERE
+            data= self._RetrieveData(request)[0][0]
+            return data
+        except:
+            print("Probleme pas d'entrer precedante")
+        
+    
+    def _DoesThisFactExist(self, Table, ):
+        request = f"SELECT * FROM {Table} WHERE {ColumnName} = {Id} ORDER BY {TPK[0]} ASC;"
+        return
+    
     def _UpdateLine(self, Table, Headers, IndexIds, Row):
         UPDATE = f"UPDATE {Table} "
         TempSET = []

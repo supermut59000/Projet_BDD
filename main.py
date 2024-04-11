@@ -28,7 +28,7 @@ try:
     
     data=Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
-    Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse)
+    Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
 except Exception as error:
     print("Cassé", error)
