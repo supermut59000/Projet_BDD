@@ -273,10 +273,11 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
                    'invoice_id':OperationnalFact[5],
                    'EmployeeId':OperationnalFact[6]}
         
-        DimensionalKeys = ['customer_id','track_id','invoice_id','EmployeeId']
-    
+        
+        
+        DicTemp['InvoiceDate'] = DWH.GetIdFromDate(DicTemp.get('InvoiceDate'))
         TPKs = DWH.InsertFactWithSCD2(TableName, OperationnalFact, Headers, IdsColumnsName, DicTemp, metadata)
-        INSERT = """INSERT INTO invoice_fact(
+        request = """INSERT INTO invoice_fact(
         invoice_line_id,
         quantity,
         TPK_customer,
@@ -293,13 +294,16 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
             TPKs.get('invoice_id'),
             TPKs.get('EmployeeId')]
         
+        if not DWH.DoesThisFactExist('invoice_fact', Headers[1:], Data)[0]:
+            print(Data)
+            DWH.cur.execute(request,Data)
         
     ###implementation employe_dim
     
     
     'WHERE ' +  ' AND '.join(TempWHERE)
     
-    
+    '''
     for d in OperationnalData : 
         DWH.cur.execute("""INSERT INTO invoice_fact (
         invoice_line_id,
@@ -310,7 +314,7 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
         TPK_invoice,
         TPK_employe)
         VALUES (?,?,?,?,?,?,?)""", d)
-    
+    '''
     return OperationnalData    
 
     

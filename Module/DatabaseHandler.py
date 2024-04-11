@@ -126,7 +126,39 @@ class DataBaseHandler:
         Tables = self._RetrieveData(request)
         return [x[0]for x in Tables if x[0] != 'sqlite_sequence']
     
-    
+    def DoesThisFactExist(self, Table, Headers, IDs):
+        SELECT = f"SELECT * FROM {Table} "
+        
+        TempWHERE = [f"{Headers[x]} = {IDs[x]}" for x in range(len(IDs))]
+        WHERE = f"WHERE {' AND '.join(TempWHERE)}"
+        Exist = False
+        request = SELECT + WHERE
+        try:
+            data = self.cur.execute(request).fetchall()
+            if data != []:
+                Exist = True
+                data = data[-1]
+        except OperationalError:
+            print('Error on request',request)
+        
+        return Exist, data
+
+    def GetIdFromDate(self,date):
+        SELECT = "SELECT date_id "
+        FROM = "FROM date_dim "
+        WHERE = f"WHERE Date_D = '{date}'"
+        request = SELECT + FROM + WHERE
+        data = []
+        try:
+            data = self.cur.execute(request).fetchall()
+            if data != []:
+                Exist = True
+                data = data[0][0]
+        except OperationalError:
+            print('Error on request',request)
+        
+        return data
+
     def _GetActiveTPKForANPK(self, Table, Headers, IndexIds, ID, SCD2Columns = []):
         
         #Definition des variables
@@ -147,11 +179,7 @@ class DataBaseHandler:
             return data
         except:
             print("Probleme pas d'entrer precedante")
-        
-    
-    def _DoesThisFactExist(self, Table, ):
-        request = f"SELECT * FROM {Table} WHERE {ColumnName} = {Id} ORDER BY {TPK[0]} ASC;"
-        return
+
     
     def _UpdateLine(self, Table, Headers, IndexIds, Row):
         UPDATE = f"UPDATE {Table} "

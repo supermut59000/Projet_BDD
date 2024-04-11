@@ -16,19 +16,7 @@ try:
     #OperationnalDatabase.executeScriptsFromFile('./SQL/Chinook_Sqlite.sql')
     #DataWareHouse.executeScriptsFromFile('./SQL/DataWareHouse.sql')
     #Module.CreateMetadata(DataWareHouse)
-    
-    SCDData = Module.ReadMetadata()
-    Module.create_date_table(DataWareHouse)
-
-    data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=SCDData)
-    
-    data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
-    
-    data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
-    
-    data=Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
-    
-    Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse, metadata=SCDData)
+    OperationnalDatabase.executeScriptsFromFile('./SQL/PROJET_MAJ.sql')
     
 except Exception as error:
     print("Cassé", error)
@@ -39,9 +27,6 @@ finally:
     print(T2-T1)
     
     
-    
-########Implémentation du DWH#########
-
 
 
 
