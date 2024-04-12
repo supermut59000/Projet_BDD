@@ -294,7 +294,7 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
             TPKs.get('invoice_id'),
             TPKs.get('EmployeeId')]
         
-        if not DWH.DoesThisFactExist('invoice_fact', Headers[1:], Data)[0]:
+        if not DWH._DoesThisIdExist(DicTemp.get('InvoiceLineId'), 'invoice_line_id', 'invoice_fact')[0]:
             print(Data)
             DWH.cur.execute(request,Data)
         
