@@ -34,7 +34,11 @@ def CreateMetadata(DatabaseObject):
     with open(PATH+ "/Metadata/Metadata.txt", "w") as writer:
         writer.write("TableName,Historique\n")
         for Table in Tables:
-            TempText = f"{Table[0]},0\n"
+            if Table[0] == 'track_dim':
+                TempText = f"{Table[0]},1\n"
+            else:
+                TempText = f"{Table[0]},0\n"
+            
             writer.write(TempText)
 
 def ReadMetadata():
@@ -295,7 +299,6 @@ def CreateInvoiceFact(DataBaseOp, DWH, metadata=[]):
             TPKs.get('EmployeeId')]
         
         if not DWH._DoesThisIdExist(DicTemp.get('InvoiceLineId'), 'invoice_line_id', 'invoice_fact')[0]:
-            print(Data)
             DWH.cur.execute(request,Data)
         
     ###implementation employe_dim

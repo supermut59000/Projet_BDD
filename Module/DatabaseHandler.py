@@ -11,6 +11,9 @@ class DataBaseHandler:
     def CloseDatabase(self):
         self.con.commit()
         self.con.close()
+        
+    def Commit(self):
+        self.con.commit()
 
     def executeScriptsFromFile(self, filename):
         # Open and read the file as a single buffer
@@ -198,9 +201,7 @@ class DataBaseHandler:
         return
 
     def _CloseLastActifEntry(self, Table, Headers, SCD2Columns, TPK):
-        print('a')
         Date = datetime.datetime.today() - datetime.timedelta(days=1)
-        print('a')
         UPDATE= f"UPDATE {Table} "
         SET = f"""SET {SCD2Columns[1]} = '{Date.strftime("%Y-%m-%d")}',
         {SCD2Columns[2]} = '0' """

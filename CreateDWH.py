@@ -24,7 +24,11 @@ def CreateMetadata(DatabaseObject):
     with open(PATH+ "/Metadata/Metadata.txt", "w") as writer:
         writer.write("TableName,Historique\n")
         for Table in Tables:
-            TempText = f"{Table[0]},0\n"
+            if Table[0] == 'track_dim':
+                TempText = f"{Table[0]},1\n"
+            else:
+                TempText = f"{Table[0]},0\n"
+            
             writer.write(TempText)
 
 T1 = time.time()

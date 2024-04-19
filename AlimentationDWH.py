@@ -9,7 +9,7 @@ import Module
 
 T1 = time.time()
 OperationnalDatabase = DataBaseHandler('OP.db')
-DataWareHouse = DataBaseHandler('DWH.db')
+DataWareHouse = DataBaseHandler('DWH1.db')
 
 
 try:    
@@ -17,9 +17,13 @@ try:
     
     Module.create_date_table(DataWareHouse)
     data=Module.CreateTrackTable(OperationnalDatabase,DataWareHouse, metadata=SCDData)
+    DataWareHouse.Commit()
     data=Module.CreateInvoiceDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
+    DataWareHouse.Commit()
     data=Module.CreateCustomerDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
+    DataWareHouse.Commit()
     data=Module.CreateEmployeDim(OperationnalDatabase,DataWareHouse, metadata=SCDData)
+    DataWareHouse.Commit()
     Module.CreateInvoiceFact(OperationnalDatabase,DataWareHouse, metadata=SCDData)
     
 except Exception as error:
