@@ -60,7 +60,7 @@ class DataBaseHandler:
                     
                     
                     if row != RowData[1:-3]:
-                        row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                        row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d"))
                         row.append('')
                         row.append('1')
                         TPKID = self._GetLastActifEntry(TableName,
@@ -80,7 +80,7 @@ class DataBaseHandler:
                     
                 else:
                     
-                    row.append(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+                    row.append(datetime.date(1900, 1, 1).strftime("%Y-%m-%d"))
                     row.append('')
                     row.append('1')
                     self._ExecuteRequest(request, row)
@@ -198,9 +198,11 @@ class DataBaseHandler:
         return
 
     def _CloseLastActifEntry(self, Table, Headers, SCD2Columns, TPK):
-        
+        print('a')
+        Date = datetime.datetime.today() - datetime.timedelta(days=1)
+        print('a')
         UPDATE= f"UPDATE {Table} "
-        SET = f"""SET {SCD2Columns[1]} = '{datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}',
+        SET = f"""SET {SCD2Columns[1]} = '{Date.strftime("%Y-%m-%d")}',
         {SCD2Columns[2]} = '0' """
         WHERE = f"WHERE {Headers[0]} = {TPK}"
         request = UPDATE + SET + WHERE
