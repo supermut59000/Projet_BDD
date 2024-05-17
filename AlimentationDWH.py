@@ -9,7 +9,7 @@ import Module
 
 T1 = time.time()
 OperationnalDatabase = DataBaseHandler('OP.db')
-DataWareHouse = DataBaseHandler('DWH1.db')
+DataWareHouse = DataBaseHandler('DWH.db')
 
 
 try:    
