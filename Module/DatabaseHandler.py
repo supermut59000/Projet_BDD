@@ -147,6 +147,7 @@ class DataBaseHandler:
         return Exist, data
 
     def GetIdFromDate(self,date):
+        date = date[:10] + 'T' + date[11:]
         SELECT = "SELECT date_id "
         FROM = "FROM date_dim "
         WHERE = f"WHERE Date_D = '{date}'"
