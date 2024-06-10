@@ -41,10 +41,19 @@ Pour exécuter le script de création deux solutions :
 - Utiliser le CreateDWH.py
 
 Une fois le script executé, un nouveau dossier Metadata contenant l'ensemble des tables ainsi qu'une colonne permettant l'application ou non du SCD2 sur celle-ci.
+La dimension Track a le SCD2 appliqué  automatiquement.
 
-##  Application de Type 2 Slowly Changing Dimension ##
+##  Alimentation du DataWare House ##
 
-Pour appliquer Slowly Changing Dimension sur le DataWare House deux solutions :
-- Utiliser le SCD2.exe
-- Utiliser le SCD2.py
+Exécuter le script AlimentationDWH.py afin d'alimenter le dataware house à partir de la base Entité-Association.
+
+##  Mise à jour de la base Entité-Association  ##
+
+Exécuter le script main.py afin de mettre à jour la base Entité-Association.
+
+## Re-alimentation du DataWare House ##
+
+Lors de la seconde alimentation du DataWare House et donc seconde exécution  du script AlimentationDWH.py, le SCD2 s'applique sur les tables spécifié  au sein du fichier metadata.
+
+
 
