@@ -1,8 +1,5 @@
 # Projet_BDD #
 
-## Description du projet ##
-
-
 ## MCD de la base Entité-Association ##
 <img src="https://github.com/supermut59000/Projet_BDD/blob/main/Assets/MCD_Entit%C3%A9s_Associations_RESLINGER_BENNOUR.PNG" alt="Texte alternatif" width="700" height="500">
 
