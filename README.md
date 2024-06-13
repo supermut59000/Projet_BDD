@@ -52,5 +52,6 @@ Exécuter le script main.py afin de mettre à jour la base Entité-Association.
 
 Lors de la seconde alimentation du DataWare House et donc seconde exécution  du script AlimentationDWH.py, le SCD2 s'applique sur les tables spécifié  au sein du fichier metadata.
 
-
-
+## Bonus ##
+### Ajout des liens youtube ###
+Nous avons créer un script permettant d'ajouter un lien vers la vidéo YouTube associer à une musique.
